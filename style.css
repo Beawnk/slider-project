@@ -1,0 +1,41 @@
+body {
+    margin: 0;
+    padding: 0;
+  }
+  
+  body * {
+    box-sizing: border-box;
+  }
+  
+  .wrapper {
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  .slider-content {
+    display: flex;
+    align-items: center;
+  }
+  
+  .slide {
+    width: 80vw;
+    flex-shrink: 0;
+    max-width: 800px;
+    margin-right: 50px;
+    height: 500px;  
+  }
+  
+  .slide:last-child {
+    margin-right: 0;
+  }
+  
+  .slide img {
+    width: 100%;
+    max-width: 100%;
+    display: block;
+    height: 100%;
+    object-fit: cover;
+  }
+  
