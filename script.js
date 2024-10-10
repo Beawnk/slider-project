@@ -146,12 +146,13 @@ class Slider {
 class SlideNav extends Slider {
 	constructor(
 		{ slider, wrapper, activeClass },
-		{ prevImg, nextImg, controls, customControls }
+		{ arrows, prevImg, nextImg, controls, customControls }
 	) {
 		super(
 			{ slider, wrapper, activeClass },
 			{ prevImg, nextImg, controls, customControls }
 		);
+        this.arrows = arrows;
 		this.prevImg = prevImg;
 		this.nextImg = nextImg;
 		this.controls = controls;
@@ -174,8 +175,14 @@ class SlideNav extends Slider {
 		this.wrapper.appendChild(this.arrowWrapper);
 		this.wrapper.children[1].appendChild(this.arrowPrev);
 		this.wrapper.children[1].appendChild(this.arrowNext);
-		this.arrowPrev.style.backgroundImage = `url(${this.prevImg})`;
-		this.arrowNext.style.backgroundImage = `url(${this.nextImg})`;
+        if (this.prevImg && this.nextImg) {
+            this.arrowPrev.style.backgroundImage = `url(${this.prevImg})`;
+		    this.arrowNext.style.backgroundImage = `url(${this.nextImg})`;
+        } else {
+            this.arrowPrev.innerHTML = "🢐";
+            this.arrowNext.innerHTML = "🢒";
+        }
+		
 	}
 
 	addArrow() {
@@ -260,7 +267,9 @@ class SlideNav extends Slider {
 
 	changeSlide(index) {
 		super.changeSlide(index);
-		this.disableArrows();
+        if (this.arrows === true) {
+            this.disableArrows();
+        }
         if (this.controls === true) {
             this.activeControl();
         }
@@ -269,8 +278,10 @@ class SlideNav extends Slider {
 	init() {
 		super.init();
         if (this.slider && this.wrapper) {
-            this.createArrow();
-            this.addArrow();
+            if (this.arrows === true) {
+                this.createArrow();
+                this.addArrow();
+            }
             if (this.controls === true) {
                 if (this.customControls === '.control') {
                     this.createControls();
@@ -295,10 +306,11 @@ new SlideNav(
 		activeClass: undefined,
 	},
 	{
-		prevImg: "/images/arrow-prev.png",
-		nextImg: "/images/arrow-next.png",
+        arrows: true,
+        prevImg: 'images/arrow-prev.png',
+        nextImg: 'images/arrow-next.png',
 		controls: true,
-		customControls: '.custom-control',
+		customControls: ".custom-control",
 	}
 );
 

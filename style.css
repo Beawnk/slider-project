@@ -91,6 +91,8 @@ body * {
     border-radius: 50%;
     cursor: pointer;
     transition: var(--transition);
+    font-size: 40px;
+    color: var(--second-color);
 }
 /* adicionado pelo js */
 /* .arrow-nav .arrow.next {
