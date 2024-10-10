@@ -138,10 +138,11 @@ class Slider {
 }
 
 class SlideNav extends Slider {
-    constructor({slider, wrapper, activeClass}, { prevImg, nextImg }) {
-        super({slider, wrapper, activeClass}, { prevImg, nextImg });
+    constructor({slider, wrapper, activeClass}, { prevImg, nextImg, controls }) {
+        super({slider, wrapper, activeClass}, { prevImg, nextImg, controls });
         this.prevImg = prevImg;
         this.nextImg = nextImg;
+        this.controls = controls;
         this.init();
     }
 
@@ -170,7 +171,7 @@ class SlideNav extends Slider {
         this.nextElement.addEventListener('click', this.activeNextSlide);
     }
 
-    disableArrow() {
+    disableArrows() {
         if (this.index.prev === undefined) {
             this.prevElement.classList.add('disabled');
             this.prevElement.removeEventListener('click', this.activeNextSlide);
@@ -188,17 +189,55 @@ class SlideNav extends Slider {
         }
     }
 
+    createControls() {
+        const controls = document.createElement('ul');
+        controls.className = 'controls';
+        this.wrapper.appendChild(controls);
+        this.slideArray.forEach((item, index) => {
+            const control = document.createElement('li');
+            control.className = 'control';
+            control.addEventListener('click', () => this.changeSlide(index));
+            controls.appendChild(control);
+        });
+        this.addControls();
+    }
+
+    addControls() {
+        this.controlsNode = document.querySelectorAll(`.${this.wrapper.className} .control`);
+        this.controlsArray = [...this.controlsNode];
+    }
+
+    activeControl() {
+        this.controlsArray.forEach((item) => item.classList.remove(this.activeClass));
+        this.controlsArray[this.index.active].classList.add(this.activeClass);
+    }
+
+    arrowKeyListener() {
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowRight') {
+                this.activeNextSlide();
+            } else if (event.key === 'ArrowLeft') {
+                this.activePrevSlide();
+            }
+        });
+    }
+
     changeSlide(index) {
         super.changeSlide(index);
-        this.disableArrow();
+        this.disableArrows();
+        this.activeControl();
     }
 
     init() {
         super.init();
         this.createArrow();
         this.addArrow();
+        if(this.controls === true) {
+            this.createControls();
+        }
         this.changeSlide(0);
-        this.disableArrow();
+        this.disableArrows();
+        this.arrowKeyListener();
         return this;
     }
 }
@@ -210,7 +249,8 @@ new SlideNav(
         activeClass: undefined
     }, 
     {   prevImg: '/images/arrow-prev.png', 
-        nextImg: '/images/arrow-next.png'
+        nextImg: '/images/arrow-next.png',
+        controls: true,
     });
 
 function debounce(callback, delay) {
