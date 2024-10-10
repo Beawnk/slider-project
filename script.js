@@ -1,16 +1,17 @@
 class Slider {
-	constructor({ slider, wrapper, activeClass }) {
-		this.slider = document.querySelector(slider);
+	constructor({ slider, sliderContent, wrapper, activeClass }) {
+        this.slider = document.querySelector(slider);
+		this.sliderContent = document.querySelector(sliderContent);
 		this.wrapper = document.querySelector(wrapper);
 		this.activeClass = activeClass || "active";
 		this.distance = { finalPosition: 0, startX: 0, movement: 0 };
 	}
 
 	onStart(event) {
-		// skipcq: JS-0119
+        event.preventDefault();
+        // skipcq: JS-0119
 		let moveType;
 		if (event.type === "mousedown") {
-			event.preventDefault();
 			this.distance.startX = event.clientX;
 			moveType = "mousemove";
 		} else {
@@ -55,11 +56,11 @@ class Slider {
 
 	moveSlide(distanceX) {
 		this.distance.movePosition = distanceX;
-		this.slider.style.transform = `translate3d(${distanceX}px, 0, 0)`;
+		this.sliderContent.style.transform = `translate3d(${distanceX}px, 0, 0)`;
 	}
 
 	transition(active) {
-		this.slider.style.transition = active ? "transform .3s" : "";
+		this.sliderContent.style.transition = active ? "transform .3s" : "";
 	}
 
 	addEvents() {
@@ -76,7 +77,7 @@ class Slider {
 	}
 
 	sliderConfig() {
-		this.slideArray = [...this.slider.children].map((element) => {
+		this.slideArray = [...this.sliderContent.children].map((element) => {
 			const position = this.slidePosition(element);
 			return { position, element };
 		});
@@ -133,7 +134,7 @@ class Slider {
 	}
 
 	init() {
-		if (this.slider && this.wrapper) {
+		if (this.sliderContent && this.wrapper) {
 			this.bindEvents();
 			this.transition(true);
 			this.addEvents();
@@ -145,11 +146,11 @@ class Slider {
 
 class SlideNav extends Slider {
 	constructor(
-		{ slider, wrapper, activeClass },
+		{ slider, sliderContent, wrapper, activeClass },
 		{ arrows, prevImg, nextImg, controls, customControls }
 	) {
 		super(
-			{ slider, wrapper, activeClass },
+			{ slider, sliderContent, wrapper, activeClass },
 			{ prevImg, nextImg, controls, customControls }
 		);
         this.arrows = arrows;
@@ -172,9 +173,9 @@ class SlideNav extends Slider {
 		this.arrowWrapper.className = "arrow-nav";
 		this.arrowPrev.className = "arrow prev";
 		this.arrowNext.className = "arrow next";
-		this.wrapper.appendChild(this.arrowWrapper);
-		this.wrapper.children[1].appendChild(this.arrowPrev);
-		this.wrapper.children[1].appendChild(this.arrowNext);
+		this.slider.appendChild(this.arrowWrapper);
+		this.slider.children[1].appendChild(this.arrowPrev);
+		this.slider.children[1].appendChild(this.arrowNext);
         if (this.prevImg && this.nextImg) {
             this.arrowPrev.style.backgroundImage = `url(${this.prevImg})`;
 		    this.arrowNext.style.backgroundImage = `url(${this.nextImg})`;
@@ -192,8 +193,11 @@ class SlideNav extends Slider {
 	}
 
 	addArrowEvents() {
-		this.prevElement.addEventListener("click", this.activePrevSlide);
-		this.nextElement.addEventListener("click", this.activeNextSlide);
+        const events = ['click', 'touchstart'];
+        events.forEach(event => {
+            this.prevElement.addEventListener(event, this.activePrevSlide);
+            this.nextElement.addEventListener(event, this.activeNextSlide);
+        });
 	}
 
 	disableArrows() {
@@ -277,7 +281,7 @@ class SlideNav extends Slider {
 
 	init() {
 		super.init();
-        if (this.slider && this.wrapper) {
+        if (this.sliderContent && this.wrapper) {
             if (this.arrows === true) {
                 this.createArrow();
                 this.addArrow();
@@ -300,8 +304,9 @@ class SlideNav extends Slider {
 
 // skipcq: JS-R1002
 new SlideNav(
-	{
-		slider: ".slider-content",
+	{   
+        slider: ".slider",
+		sliderContent: ".slider-content",
 		wrapper: ".slider-wrapper",
 		activeClass: undefined,
 	},
