@@ -1,5 +1,5 @@
 class Slider {
-	constructor(slider, wrapper, activeClass) {
+	constructor({slider, wrapper, activeClass}) {
 		this.slider = document.querySelector(slider);
 		this.wrapper = document.querySelector(wrapper);
 		this.activeClass = activeClass || "active";
@@ -18,23 +18,17 @@ class Slider {
 		}
 		this.wrapper.addEventListener(moveType, this.onMove);
 		this.transition(false);
-		console.log(1);
 	}
 
 	updatePosition(clientX) {
 		this.distance.movement = (this.distance.startX - clientX) * 1.6;
 		return this.distance.finalPosition - this.distance.movement;
-		console.log(2);
 	}
 
 	onMove(event) {
-		const pointerPosition =
-			event.type === "mousemove"
-				? event.clientX
-				: event.changedTouches[0].clientX;
+		const pointerPosition = event.type === "mousemove" ? event.clientX : event.changedTouches[0].clientX;
 		const finalPosition = this.updatePosition(pointerPosition);
 		this.moveSlide(finalPosition);
-		console.log(3);
 	}
 
 	onStop(event) {
@@ -43,7 +37,6 @@ class Slider {
 		this.distance.finalPosition = this.distance.movePosition;
 		this.transition(true);
 		this.changeSlideOnStop();
-		console.log(4);
 	}
 
 	changeSlideOnStop() {
@@ -59,7 +52,6 @@ class Slider {
 	moveSlide(distanceX) {
 		this.distance.movePosition = distanceX;
 		this.slider.style.transform = `translate3d(${distanceX}px, 0, 0)`;
-		console.log(5);
 	}
 
 	transition(active) {
@@ -127,6 +119,10 @@ class Slider {
 		this.onStart = this.onStart.bind(this);
 		this.onMove = this.onMove.bind(this);
 		this.onStop = this.onStop.bind(this);
+
+        this.activePrevSlide = this.activePrevSlide.bind(this);
+        this.activeNextSlide = this.activeNextSlide.bind(this);
+
         this.onResize = debounce(this.onResize.bind(this), 200);
 	}
 
@@ -140,9 +136,82 @@ class Slider {
 		}
 	}
 }
+
+class SlideNav extends Slider {
+    constructor({slider, wrapper, activeClass}, { prevImg, nextImg }) {
+        super({slider, wrapper, activeClass}, { prevImg, nextImg });
+        this.prevImg = prevImg;
+        this.nextImg = nextImg;
+        this.init();
+    }
+
+    createArrow() {
+        this.arrowWrapper = document.createElement('div');
+        this.arrowPrev = document.createElement('span');
+        this.arrowNext = document.createElement('span');
+        this.arrowWrapper.className = 'arrow-nav';
+        this.arrowPrev.className = 'arrow prev';
+        this.arrowNext.className = 'arrow next';
+        this.wrapper.appendChild(this.arrowWrapper);
+        this.wrapper.children[1].appendChild(this.arrowPrev);
+        this.wrapper.children[1].appendChild(this.arrowNext);
+        this.arrowPrev.style.backgroundImage = `url(${this.prevImg})`;
+        this.arrowNext.style.backgroundImage = `url(${this.nextImg})`;
+    }
+
+    addArrow() {
+        this.prevElement = document.querySelector('.arrow.prev');
+        this.nextElement = document.querySelector('.arrow.next');
+        this.addArrowEvents();
+    }
+
+    addArrowEvents() {
+        this.prevElement.addEventListener('click', this.activePrevSlide);
+        this.nextElement.addEventListener('click', this.activeNextSlide);
+    }
+
+    disableArrow() {
+        if (this.index.prev === undefined) {
+            this.prevElement.classList.add('disabled');
+            this.prevElement.removeEventListener('click', this.activeNextSlide);
+        } else if (this.index.prev !== undefined && this.prevElement.classList.contains('disabled')) {
+            this.prevElement.classList.remove('disabled');
+            this.addArrowEvents();
+        }
+
+        if (this.index.next === undefined) {
+            this.nextElement.classList.add('disabled');
+            this.nextElement.removeEventListener('click', this.activePrevSlide);
+        } else if (this.index.next !== undefined && this.nextElement.classList.contains('disabled')) {
+            this.nextElement.classList.remove('disabled');
+            this.addArrowEvents();
+        }
+    }
+
+    changeSlide(index) {
+        super.changeSlide(index);
+        this.disableArrow();
+    }
+
+    init() {
+        super.init();
+        this.createArrow();
+        this.addArrow();
+        this.changeSlide(0);
+        this.disableArrow();
+        return this;
+    }
+}
   
-const newSlider = new Slider('.slider-content', '.wrapper');
-newSlider.init().slideIndexNav(3);
+new SlideNav(
+    {
+        slider: '.slider-content', 
+        wrapper: '.wrapper', 
+        activeClass: undefined
+    }, 
+    {   prevImg: '/images/arrow-prev.png', 
+        nextImg: '/images/arrow-next.png'
+    });
 
 function debounce(callback, delay) {
     let timer;

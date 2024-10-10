@@ -52,4 +52,39 @@ body * {
     height: 100%;
     object-fit: cover;
 }
-  
+
+.arrow-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    z-index: 1;
+}
+
+.arrow-nav .arrow {
+    width: 50px;
+    height: 50px;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: .3s;
+}
+/* adicionado pelo js */
+/* .arrow-nav .arrow.next {
+    background-image: url(/images/arrow-next.png);
+}
+.arrow-nav .arrow.prev {
+    background-image: url(/images/arrow-prev.png);
+} */
+.arrow-nav .arrow:hover {
+    opacity: .7;
+}
+
+.arrow-nav .arrow.disabled {
+   opacity: .1;
+}
