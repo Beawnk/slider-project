@@ -245,7 +245,7 @@ class SlideNav extends Slider {
 new SlideNav(
     {
         slider: '.slider-content', 
-        wrapper: '.wrapper', 
+        wrapper: '.slider-wrapper', 
         activeClass: undefined
     }, 
     {   prevImg: '/images/arrow-prev.png', 

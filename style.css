@@ -1,3 +1,14 @@
+:root {
+    --bg-color: #000;
+    --second-color: #fff;
+    --body-heigth: 100vh;
+    --slide-heigth: 500px;
+    --slide-width: 80vw;
+    --slide-max-width: 800px;
+    --custom-controls-top: calc(var(--slide-heigth) / 2 - 100px);
+    --border-radius: 10px;
+    --transition: .3s;
+}
 body {
     margin: 0;
     padding: 0;
@@ -6,13 +17,19 @@ body {
 body * {
     box-sizing: border-box;
 }
-  
-.wrapper {
+.container {
+    background-color: var(--bg-color);
+    height: var(--body-heigth);
+    position: relative;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.slider-wrapper {
     overflow: hidden;
     display: flex;
     align-items: center;
-    height: 100vh;
-    background-color: rgb(0, 0, 0);
 }
   
 .slider-content {
@@ -25,15 +42,15 @@ body * {
 }
   
 .slide {
-    width: 80vw;
+    width: var(--slide-width);
     flex-shrink: 0;
-    max-width: 800px;
-    height: 500px; 
+    max-width: var(--slide-max-width);
+    height: var(--slide-heigth); 
     opacity: .5; 
     transform: scale(.8);
     transition: .5s;
     /* optional */
-    border-radius: 10px;
+    border-radius: var(--border-radius);
     overflow: hidden;
 }
 .slide.active {
@@ -73,7 +90,7 @@ body * {
     align-items: center;
     border-radius: 50%;
     cursor: pointer;
-    transition: .3s;
+    transition: var(--transition);
 }
 /* adicionado pelo js */
 /* .arrow-nav .arrow.next {
@@ -103,13 +120,45 @@ body * {
     list-style: none;
     width: 10px;
     height: 10px;
-    background-color: #fff;
+    background-color: var(--second-color);
     border-radius: 50%;
     margin: 0 5px;
     cursor: pointer;
-    transition: .3s;
+    transition: var(--transition);
 }
+
 .controls .control.active,
 .controls .control:hover {
     opacity: .1;
+}
+.custom-controls {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+.custom-controls .custom-control {
+    width: 60px;
+    height: 60px;
+    overflow: hidden;
+    border-radius: 50%;
+    margin-right: 15px;
+}
+
+.custom-controls .custom-control:last-child {
+    margin-right: 0;
+}
+
+.custom-controls .custom-control:hover,
+.custom-controls .custom-control.active {
+    border: 3px solid var(--second-color);
+}
+
+.custom-controls .custom-control img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+    transition: var(--transition);
 }
