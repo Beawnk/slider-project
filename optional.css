@@ -75,7 +75,7 @@ body * {
 
 @media (max-width: 480px) {
     .custom-controls {
-        margin-bottom: 15px;
+        margin-bottom: 20px;
     }
     .custom-controls .custom-control {
         width: 40px;
