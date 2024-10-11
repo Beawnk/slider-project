@@ -13,7 +13,7 @@ class Slider {
 
 	onStart(event) {
         event.preventDefault();
-        // skipcq: JS-0119
+		// skipcq: JS-0119
 		let moveType;
 		if (event.type === "mousedown") {
 			this.distance.startX = event.clientX;
@@ -31,29 +31,23 @@ class Slider {
 		return this.distance.finalPosition - this.distance.movement;
 	}
 
-	onMove(event) {  
-        // Store the current event and use requestAnimationFrame to handle it  
-        const pointerPosition = event.type === "mousemove"  
-            ? event.clientX  
-            : event.changedTouches[0].clientX;  
-    
-        if (!this.rafId) { // Check if there’s no pending animation frame  
-            this.rafId = requestAnimationFrame(() => {  
-                const finalPosition = this.updatePosition(pointerPosition);  
-                this.moveSlide(finalPosition);  
-                this.rafId = null; // Reset the rafId  
-            });  
-        }  
-    } 
+	onMove(event) {
+		const pointerPosition =
+			event.type === "mousemove"
+				? event.clientX
+				: event.changedTouches[0].clientX;
+		const finalPosition = this.updatePosition(pointerPosition);
+		this.moveSlide(finalPosition);
+	}
 
-	onStop(event) {  
-        const moveType = event.type === "mouseup" ? "mousemove" : "touchmove";  
-        this.wrapper.removeEventListener(moveType, this.onMove);
-
-        this.distance.finalPosition = this.distance.movePosition;  
-        this.transition(true);  
-        this.changeSlideOnStop();  
-    }
+	onStop(event) {
+		const moveType = event.type === "mouseup" ? "mousemove" : "touchmove";
+		this.wrapper.removeEventListener(moveType, this.onMove);
+        
+		this.distance.finalPosition = this.distance.movePosition;
+		this.transition(true);
+		this.changeSlideOnStop();
+	}
 
 	changeSlideOnStop() {
 		if (this.distance.movement > 120 && this.index.next !== undefined) {
@@ -88,10 +82,9 @@ class Slider {
 	}
 
 	sliderConfig() {
-		const slides = this.sliderContent.children;  
-		this.slideArray = [...slides].map((element) => {  
-			const position = this.slidePosition(element);  
-			return { position, element };  
+		this.slideArray = [...this.sliderContent.children].map((element) => {
+			const position = this.slidePosition(element);
+			return { position, element };
 		});
 	}
 
@@ -121,10 +114,10 @@ class Slider {
 	}
 
 	changeActiveClass() {
-		for (let slide of this.slideArray) {  
-			slide.element.classList.remove(this.activeClass);  
-		}  
-		this.slideArray[this.index.active].element.classList.add(this.activeClass); 
+		this.slideArray.forEach((item) =>
+			item.element.classList.remove(this.activeClass)
+		);
+		this.slideArray[this.index.active].element.classList.add(this.activeClass);
 	}
 
 	onResize() {
@@ -163,7 +156,7 @@ class SlideNav extends Slider {
 	) {
 		super(
 			{ slider, sliderContent, wrapper, activeClass },
-			{ prevImg, nextImg, controls, customControls }
+			{ arrows, prevImg, nextImg, controls, customControls }
 		);
         this.arrows = arrows;
 		this.prevImg = prevImg;
@@ -198,7 +191,6 @@ class SlideNav extends Slider {
             this.arrowPrev.innerHTML = "🢐";
             this.arrowNext.innerHTML = "🢒";
         }
-		
 	}
 
 	addArrow() {
@@ -210,15 +202,15 @@ class SlideNav extends Slider {
 	addArrowEvents() {
         const events = ['click', 'touchstart'];
         events.forEach(event => {
-            this.prevElement.addEventListener(event, this.activePrevSlide, { passive: true });
-            this.nextElement.addEventListener(event, this.activeNextSlide, { passive: true });
+            this.prevElement.addEventListener(event, this.activePrevSlide);
+            this.nextElement.addEventListener(event, this.activeNextSlide);
         });
 	}
 
 	disableArrows() {
 		if (this.index.prev === undefined) {
 			this.prevElement.classList.add("disabled");
-			this.prevElement.removeEventListener("click", this.activeNextSlide);
+			this.prevElement.removeEventListener("click", this.activePrevSlide);
 		} else if (
 			this.index.prev !== undefined &&
 			this.prevElement.classList.contains("disabled")
@@ -229,7 +221,7 @@ class SlideNav extends Slider {
 
 		if (this.index.next === undefined) {
 			this.nextElement.classList.add("disabled");
-			this.nextElement.removeEventListener("click", this.activePrevSlide);
+			this.nextElement.removeEventListener("click", this.activeNextSlide);
 		} else if (
 			this.index.next !== undefined &&
 			this.nextElement.classList.contains("disabled")
@@ -286,7 +278,7 @@ class SlideNav extends Slider {
 
 	changeSlide(index) {
 		super.changeSlide(index);
-        if (this.arrows === true) {
+		if (this.arrows === true) {
             this.disableArrows();
         }
         if (this.controls === true) {
@@ -310,7 +302,9 @@ class SlideNav extends Slider {
                 }
             }
             this.changeSlide(0);
-            this.disableArrows();
+            if (this.arrows === true) {
+                this.disableArrows();
+            }
             this.arrowKeyListener();
         }
 		return this;
@@ -327,10 +321,10 @@ new SlideNav(
 	},
 	{
         arrows: true,
-        prevImg: 'images/arrow-prev.png',
-        nextImg: 'images/arrow-next.png',
+		prevImg: "/images/arrow-prev.png",
+		nextImg: "/images/arrow-next.png",
 		controls: true,
-		customControls: ".custom-control",
+		customControls: '.custom-control',
 	}
 );
 
@@ -345,14 +339,3 @@ function debounce(callback, delay) {
 		}, delay);
 	};
 }
-
-function throttle(callback, limit) {  
-    let lastCall = 0;  
-    return function(...args) {  
-        const now = Date.now();  
-        if (now - lastCall >= limit) {  
-            lastCall = now;  
-            callback(...args);  
-        }  
-    };  
-}  
