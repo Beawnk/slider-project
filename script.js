@@ -77,7 +77,7 @@ class Slider {
 	addEvents() {
 		window.addEventListener("resize", this.onResize);
 		this.wrapper.addEventListener("mousedown", this.onStart);
-		this.wrapper.addEventListener("touchstart", this.onStart);
+		this.wrapper.addEventListener("touchstart", this.onStart, { passive: true });
 		this.wrapper.addEventListener("mouseup", this.onStop);
 		this.wrapper.addEventListener("touchend", this.onStop);
 	}
@@ -179,7 +179,6 @@ class SlideNav extends Slider {
 	}
 
 	createArrow() {
-        console.log(1);
 		this.arrowWrapper = document.createElement("div");
 		this.arrowPrev = document.createElement("span");
 		this.arrowNext = document.createElement("span");
@@ -203,23 +202,20 @@ class SlideNav extends Slider {
 	}
 
 	addArrow() {
-        console.log(2);
 		this.prevElement = document.querySelector(".arrow.prev");
 		this.nextElement = document.querySelector(".arrow.next");
 		this.addArrowEvents();
 	}
 
 	addArrowEvents() {
-        console.log(3);
         const events = ['click', 'touchstart'];
         events.forEach(event => {
-            this.prevElement.addEventListener(event, this.activePrevSlide);
-            this.nextElement.addEventListener(event, this.activeNextSlide);
+            this.prevElement.addEventListener(event, this.activePrevSlide, { passive: true });
+            this.nextElement.addEventListener(event, this.activeNextSlide, { passive: true });
         });
 	}
 
 	disableArrows() {
-        console.log(4);
 		if (this.index.prev === undefined) {
 			this.prevElement.classList.add("disabled");
 			this.prevElement.removeEventListener("click", this.activeNextSlide);
@@ -244,7 +240,6 @@ class SlideNav extends Slider {
 	}
 
 	createControls() {
-        console.log(5);
 		const controls = document.createElement("ul");
 		controls.className = "controls";
 		this.wrapper.appendChild(controls);
@@ -258,7 +253,6 @@ class SlideNav extends Slider {
 	}
 
     addCustomControls() {
-        console.log(6);
         this.slideArray.forEach(() => {
 			this.controlsArray.forEach((control, i) => {
                 control.addEventListener("click", () => this.changeSlide(i));
@@ -267,7 +261,6 @@ class SlideNav extends Slider {
     }
 
 	addControls() {
-        console.log(7);
 		this.controlsNode = document.querySelectorAll(
 			`${this.customControls}`
 		);
@@ -275,7 +268,6 @@ class SlideNav extends Slider {
 	}
 
 	activeControl() {
-        console.log(8);
 		this.controlsArray.forEach((item) =>
 			item.classList.remove(this.activeClass)
 		);
@@ -283,7 +275,6 @@ class SlideNav extends Slider {
 	}
 
 	arrowKeyListener() {
-        console.log(9);
 		document.addEventListener("keydown", (event) => {
 			if (event.key === "ArrowRight") {
 				this.activeNextSlide();
@@ -294,7 +285,6 @@ class SlideNav extends Slider {
 	}
 
 	changeSlide(index) {
-        console.log(10);
 		super.changeSlide(index);
         if (this.arrows === true) {
             this.disableArrows();
