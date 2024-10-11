@@ -114,13 +114,13 @@ class Slider {
 	}
 
 	activePrevSlide() {
-			this.newIndex = this.index.prev === -1 ? this.totalSlides - 1 : this.index.prev; // Loop to last if at start  
-			this.changeSlide(this.newIndex);
+		this.newIndex = this.index.prev === -1 ? this.totalSlides - 1 : this.index.prev; // Loop to last if at start  
+		this.changeSlide(this.newIndex);
 	}
 
 	activeNextSlide() {
-			this.newIndex = this.index.next === this.totalSlides ? 0 : this.index.next; // Loop to first if at end  
-			this.changeSlide(this.newIndex);
+		this.newIndex = this.index.next === this.totalSlides ? 0 : this.index.next; // Loop to first if at end  
+		this.changeSlide(this.newIndex);
 	}
 
 	createDuplicatedSlides() {  
