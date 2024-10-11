@@ -7,20 +7,19 @@ class Slider {
 		this.distance = { finalPosition: 0, startX: 0, movement: 0 };
 	}
 
-	onStart(event) {
-        event.preventDefault();
-		// skipcq: JS-0119
-		let moveType;
-		if (event.type === "mousedown") {
-			this.distance.startX = event.clientX;
-			moveType = "mousemove";
-		} else {
-			this.distance.startX = event.changedTouches[0].clientX;
-			moveType = "touchmove";
-		}
-		this.wrapper.addEventListener(moveType, this.onMove);
-		this.transition(false);
-	}
+	onStart(event) {  
+        event.preventDefault();  
+        let moveType;  
+        if (event.type === "mousedown") {  
+            this.distance.startX = event.clientX;  
+            moveType = "mousemove";  
+        } else {  
+            this.distance.startX = event.changedTouches[0].clientX;  
+            moveType = "touchmove";  
+        }  
+        this.wrapper.addEventListener(moveType, this.onMove);  
+        this.transition(false);   
+    }
 
 	updatePosition(clientX) {
 		this.distance.movement = (this.distance.startX - clientX) * 1.6;
@@ -36,14 +35,18 @@ class Slider {
 		this.moveSlide(finalPosition);
 	}
 
-	onStop(event) {
-		const moveType = event.type === "mouseup" ? "mousemove" : "touchmove";
-		this.wrapper.removeEventListener(moveType, this.onMove);
-        
-		this.distance.finalPosition = this.distance.movePosition;
-		this.transition(true);
-		this.changeSlideOnStop();
-	}
+	onStop(event) {  
+        const moveType = event.type === "mouseup" ? "mousemove" : "touchmove";  
+        this.wrapper.removeEventListener(moveType, this.onMove);  
+      
+        // Important to reset distance here  
+        this.distance.finalPosition = this.distance.movePosition;  
+         // Reset the distance movement after stopping  
+    
+        this.transition(true);  
+        this.changeSlideOnStop();  
+        this.distance.movement = 0;
+    } 
 
 	changeSlideOnStop() {
 		if (this.distance.movement > 120 && this.index.next !== undefined) {
@@ -196,36 +199,31 @@ class SlideNav extends Slider {
 	}
 
 	addArrowEvents() {
-        const events = ['click', 'touchstart'];
-        events.forEach(event => {
-            this.prevElement.addEventListener(event, this.activePrevSlide);
-            this.nextElement.addEventListener(event, this.activeNextSlide);
-        });
+        const events = ['click', 'touchstart'];  
+        events.forEach(event => {  
+            // Re-adding listeners to ensure they are correctly functioning  
+            this.prevElement.addEventListener(event, this.activePrevSlide);  
+            this.nextElement.addEventListener(event, this.activeNextSlide);  
+        }); 
 	}
 
-	disableArrows() {
-		if (this.index.prev === undefined) {
-			this.prevElement.classList.add("disabled");
-			this.prevElement.removeEventListener("click", this.activePrevSlide);
-		} else if (
-			this.index.prev !== undefined &&
-			this.prevElement.classList.contains("disabled")
-		) {
-			this.prevElement.classList.remove("disabled");
-			this.addArrowEvents();
-		}
-
-		if (this.index.next === undefined) {
-			this.nextElement.classList.add("disabled");
-			this.nextElement.removeEventListener("click", this.activeNextSlide);
-		} else if (
-			this.index.next !== undefined &&
-			this.nextElement.classList.contains("disabled")
-		) {
-			this.nextElement.classList.remove("disabled");
-			this.addArrowEvents();
-		}
-	}
+	disableArrows() {  
+        if (this.index.prev === undefined) {  
+            this.prevElement.classList.add("disabled");  
+            this.prevElement.removeEventListener("click", this.activePrevSlide);  
+        } else if (this.index.prev !== undefined && this.prevElement.classList.contains("disabled")) {  
+            this.prevElement.classList.remove("disabled");  
+            this.addArrowEvents(); // Re-add arrow events  
+        }  
+    
+        if (this.index.next === undefined) {  
+            this.nextElement.classList.add("disabled");  
+            this.nextElement.removeEventListener("click", this.activeNextSlide);  
+        } else if (this.index.next !== undefined && this.nextElement.classList.contains("disabled")) {  
+            this.nextElement.classList.remove("disabled");  
+            this.addArrowEvents(); // Re-add arrow events  
+        }  
+    }
 
 	createControls() {
 		const controls = document.createElement("ul");
