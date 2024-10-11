@@ -87,16 +87,25 @@ class Slider {
 	}
 
 	slideIndexNav(index) {
-		const lastPosition = this.slideArray.length - 1;
-		this.index = {
-			prev: index ? index - 1 : undefined,
-			active: index,
-			next: index === lastPosition ? undefined : index + 1,
-		};
+		if (this.loop) {
+			const totalSlides = this.loop ? this.slideArray.length - 2 : this.slideArray.length; // Exclude duplicates  
+			this.index = {  
+				prev: (index - 1 + totalSlides) % totalSlides,  
+				active: index % totalSlides,  
+				next: (index + 1) % totalSlides,  
+			}; 
+		} else {
+			const lastPosition = this.slideArray.length - 1;
+			this.index = {
+				prev: index ? index - 1 : undefined,
+				active: index,
+				next: index === lastPosition ? undefined : index + 1,
+			};
+		}
 	}
 
 	changeSlide(index) {
-		const activeSlide = this.slideArray[index];
+		const activeSlide = this.loop ? this.slideArray[index + 1] : this.slideArray[index];
 		this.moveSlide(activeSlide.position);
 		this.slideIndexNav(index);
 		this.distance.finalPosition = activeSlide.position;
@@ -104,18 +113,34 @@ class Slider {
 	}
 
 	activePrevSlide() {
-		if (this.index.prev !== undefined) this.changeSlide(this.index.prev);
+			const totalSlides = this.loop ? this.slideArray.length - 2 : this.slideArray.length; // Consider duplicates  
+			const newIndex = this.index.prev === -1 ? totalSlides - 1 : this.index.prev; // Loop to last if at start  
+			this.changeSlide(newIndex);
 	}
 
 	activeNextSlide() {
-		if (this.index.next !== undefined) this.changeSlide(this.index.next);
+			const totalSlides = this.loop ? this.slideArray.length - 2 : this.slideArray.length; // Consider duplicates  
+			const newIndex = this.index.next === totalSlides ? 0 : this.index.next; // Loop to first if at end  
+			this.changeSlide(newIndex);
 	}
+
+	createDuplicatedSlides() {  
+		if (this.loop) { 
+			const firstSlide = this.sliderContent.children[0].cloneNode(true);  
+			const lastSlide = this.sliderContent.children[this.sliderContent.children.length - 1].cloneNode(true);  
+			this.sliderContent.appendChild(firstSlide);  
+			this.sliderContent.insertBefore(lastSlide, this.sliderContent.children[0]); 
+			this.sliderConfig();
+		}  
+	} 
 
 	changeActiveClass() {
 		this.slideArray.forEach((item) =>
 			item.element.classList.remove(this.activeClass)
 		);
-		this.slideArray[this.index.active].element.classList.add(this.activeClass);
+		this.loop 
+		? this.slideArray[this.index.active + 1].element.classList.add(this.activeClass) 
+		: this.slideArray[this.index.active].element.classList.add(this.activeClass);
 	}
 
 	onResize() {
@@ -142,6 +167,7 @@ class Slider {
 			this.transition(true);
 			this.addEvents();
 			this.sliderConfig();
+			this.createDuplicatedSlides();
 		}
 		return this;
 	}
