@@ -1,8 +1,9 @@
 class Slider {
-	constructor({ sliderContent, wrapper, activeClass }) {
+	constructor({ sliderContent, wrapper, activeClass, loop }) {
 		this.sliderContent = document.querySelector(sliderContent);
 		this.wrapper = document.querySelector(wrapper);
 		this.activeClass = activeClass || "active";
+		this.loop = loop === true ? loop : false;
 		this.distance = { finalPosition: 0, startX: 0, movement: 0 };
 	}
 
@@ -39,9 +40,7 @@ class Slider {
         const moveType = event.type === "mouseup" ? "mousemove" : "touchmove";  
         this.wrapper.removeEventListener(moveType, this.onMove);  
       
-        // Important to reset distance here  
         this.distance.finalPosition = this.distance.movePosition;  
-         // Reset the distance movement after stopping  
     
         this.transition(true);  
         this.changeSlideOnStop();  
@@ -150,22 +149,17 @@ class Slider {
 
 class SlideNav extends Slider {
 	constructor(
-		{ sliderContent, wrapper, activeClass },
+		{ sliderContent, wrapper, activeClass, loop },
 		{ arrows, prevImg, nextImg, controls, customControls }
 	) {
 		super(
-			{ sliderContent, wrapper, activeClass },
-			{ arrows, prevImg, nextImg, controls, customControls }
+			{ sliderContent, wrapper, activeClass, loop }
 		);
-        this.arrows = arrows;
+        this.arrows = arrows === true ? arrows : false;
 		this.prevImg = prevImg;
 		this.nextImg = nextImg;
-		this.controls = controls;
-        if (customControls !== undefined) {
-            this.customControls = customControls;
-        } else {
-            this.customControls = '.control';
-        }
+		this.controls = controls === true ? controls : false;
+		this.customControls = customControls !== undefined ? customControls : '.control';
 		
 		this.init();
 	}
@@ -310,6 +304,7 @@ new SlideNav(
 		sliderContent: ".slider-content",
 		wrapper: ".slider-wrapper",
 		activeClass: undefined,
+		loop: true
 	},
 	{
         arrows: true,
