@@ -67,7 +67,7 @@ class Slider {
 	addEvents() {
 		window.addEventListener("resize", this.onResize);
 		this.wrapper.addEventListener("mousedown", this.onStart);
-		this.wrapper.addEventListener("touchstart", this.onStart, { passive: true });
+		this.wrapper.addEventListener("touchstart", this.onStart);
 		this.wrapper.addEventListener("mouseup", this.onStop);
 		this.wrapper.addEventListener("touchend", this.onStop);
 	}
