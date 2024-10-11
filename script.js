@@ -5,6 +5,10 @@ class Slider {
 		this.wrapper = document.querySelector(wrapper);
 		this.activeClass = activeClass || "active";
 		this.distance = { finalPosition: 0, startX: 0, movement: 0 };
+        this.rafId = null; // Added to handle requestAnimationFrame id  
+		this.index = { active: 0, prev: undefined, next: undefined };  
+		this.slideArray = [];  
+		this.addEvents();  
 	}
 
 	onStart(event) {
@@ -27,22 +31,29 @@ class Slider {
 		return this.distance.finalPosition - this.distance.movement;
 	}
 
-	onMove(event) {
-		const pointerPosition =
-			event.type === "mousemove"
-				? event.clientX
-				: event.changedTouches[0].clientX;
-		const finalPosition = this.updatePosition(pointerPosition);
-		this.moveSlide(finalPosition);
-	}
+	onMove(event) {  
+        // Store the current event and use requestAnimationFrame to handle it  
+        const pointerPosition = event.type === "mousemove"  
+            ? event.clientX  
+            : event.changedTouches[0].clientX;  
+    
+        if (!this.rafId) { // Check if there’s no pending animation frame  
+            this.rafId = requestAnimationFrame(() => {  
+                const finalPosition = this.updatePosition(pointerPosition);  
+                this.moveSlide(finalPosition);  
+                this.rafId = null; // Reset the rafId  
+            });  
+        }  
+    } 
 
-	onStop(event) {
-		const moveType = event.type === "mouseup" ? "mousemove" : "touchmove";
-		this.wrapper.removeEventListener(moveType, this.onMove);
-		this.distance.finalPosition = this.distance.movePosition;
-		this.transition(true);
-		this.changeSlideOnStop();
-	}
+	onStop(event) {  
+        const moveType = event.type === "mouseup" ? "mousemove" : "touchmove";  
+        this.wrapper.removeEventListener(moveType, this.onMove);
+
+        this.distance.finalPosition = this.distance.movePosition;  
+        this.transition(true);  
+        this.changeSlideOnStop();  
+    }
 
 	changeSlideOnStop() {
 		if (this.distance.movement > 120 && this.index.next !== undefined) {
@@ -77,9 +88,10 @@ class Slider {
 	}
 
 	sliderConfig() {
-		this.slideArray = [...this.sliderContent.children].map((element) => {
-			const position = this.slidePosition(element);
-			return { position, element };
+		const slides = this.sliderContent.children;  
+		this.slideArray = [...slides].map((element) => {  
+			const position = this.slidePosition(element);  
+			return { position, element };  
 		});
 	}
 
@@ -109,10 +121,10 @@ class Slider {
 	}
 
 	changeActiveClass() {
-		this.slideArray.forEach((item) =>
-			item.element.classList.remove(this.activeClass)
-		);
-		this.slideArray[this.index.active].element.classList.add(this.activeClass);
+		for (let slide of this.slideArray) {  
+			slide.element.classList.remove(this.activeClass);  
+		}  
+		this.slideArray[this.index.active].element.classList.add(this.activeClass); 
 	}
 
 	onResize() {
@@ -124,7 +136,7 @@ class Slider {
 
 	bindEvents() {
 		this.onStart = this.onStart.bind(this);
-		this.onMove = this.onMove.bind(this);
+		this.onMove = throttle(this.onMove.bind(this), 100);
 		this.onStop = this.onStop.bind(this);
 
 		this.activePrevSlide = this.activePrevSlide.bind(this);
@@ -167,15 +179,19 @@ class SlideNav extends Slider {
 	}
 
 	createArrow() {
+        console.log(1);
 		this.arrowWrapper = document.createElement("div");
 		this.arrowPrev = document.createElement("span");
 		this.arrowNext = document.createElement("span");
+
 		this.arrowWrapper.className = "arrow-nav";
 		this.arrowPrev.className = "arrow prev";
 		this.arrowNext.className = "arrow next";
+
 		this.slider.appendChild(this.arrowWrapper);
 		this.slider.children[1].appendChild(this.arrowPrev);
 		this.slider.children[1].appendChild(this.arrowNext);
+
         if (this.prevImg && this.nextImg) {
             this.arrowPrev.style.backgroundImage = `url(${this.prevImg})`;
 		    this.arrowNext.style.backgroundImage = `url(${this.nextImg})`;
@@ -187,12 +203,14 @@ class SlideNav extends Slider {
 	}
 
 	addArrow() {
+        console.log(2);
 		this.prevElement = document.querySelector(".arrow.prev");
 		this.nextElement = document.querySelector(".arrow.next");
 		this.addArrowEvents();
 	}
 
 	addArrowEvents() {
+        console.log(3);
         const events = ['click', 'touchstart'];
         events.forEach(event => {
             this.prevElement.addEventListener(event, this.activePrevSlide);
@@ -201,6 +219,7 @@ class SlideNav extends Slider {
 	}
 
 	disableArrows() {
+        console.log(4);
 		if (this.index.prev === undefined) {
 			this.prevElement.classList.add("disabled");
 			this.prevElement.removeEventListener("click", this.activeNextSlide);
@@ -225,6 +244,7 @@ class SlideNav extends Slider {
 	}
 
 	createControls() {
+        console.log(5);
 		const controls = document.createElement("ul");
 		controls.className = "controls";
 		this.wrapper.appendChild(controls);
@@ -238,6 +258,7 @@ class SlideNav extends Slider {
 	}
 
     addCustomControls() {
+        console.log(6);
         this.slideArray.forEach(() => {
 			this.controlsArray.forEach((control, i) => {
                 control.addEventListener("click", () => this.changeSlide(i));
@@ -246,6 +267,7 @@ class SlideNav extends Slider {
     }
 
 	addControls() {
+        console.log(7);
 		this.controlsNode = document.querySelectorAll(
 			`${this.customControls}`
 		);
@@ -253,6 +275,7 @@ class SlideNav extends Slider {
 	}
 
 	activeControl() {
+        console.log(8);
 		this.controlsArray.forEach((item) =>
 			item.classList.remove(this.activeClass)
 		);
@@ -260,6 +283,7 @@ class SlideNav extends Slider {
 	}
 
 	arrowKeyListener() {
+        console.log(9);
 		document.addEventListener("keydown", (event) => {
 			if (event.key === "ArrowRight") {
 				this.activeNextSlide();
@@ -270,6 +294,7 @@ class SlideNav extends Slider {
 	}
 
 	changeSlide(index) {
+        console.log(10);
 		super.changeSlide(index);
         if (this.arrows === true) {
             this.disableArrows();
@@ -330,3 +355,14 @@ function debounce(callback, delay) {
 		}, delay);
 	};
 }
+
+function throttle(callback, limit) {  
+    let lastCall = 0;  
+    return function(...args) {  
+        const now = Date.now();  
+        if (now - lastCall >= limit) {  
+            lastCall = now;  
+            callback(...args);  
+        }  
+    };  
+}  
