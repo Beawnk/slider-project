@@ -41,16 +41,16 @@ class Slider {
         this.wrapper.removeEventListener(moveType, this.onMove);  
       
         this.distance.finalPosition = this.distance.movePosition;  
-    
-        this.transition(true);  
         this.changeSlideOnStop();  
         this.distance.movement = 0;
     } 
 
 	changeSlideOnStop() {
 		if (this.distance.movement > 120 && this.index.next !== undefined) {
+			this.index.active === this.totalSlides - 1 ? this.transition(false) : this.transition(true);
 			this.activeNextSlide();
 		} else if (this.distance.movement < -120 && this.index.prev !== undefined) {
+			this.index.active === 0 ? this.transition(false) : this.transition(true);
 			this.activePrevSlide();
 		} else {
 			this.changeSlide(this.index.active);
@@ -84,6 +84,7 @@ class Slider {
 			const position = this.slidePosition(element);
 			return { position, element };
 		});
+		this.totalSlides = this.loop ? this.slideArray.length - 2 : this.slideArray.length;
 	}
 
 	slideIndexNav(index) {
@@ -113,15 +114,13 @@ class Slider {
 	}
 
 	activePrevSlide() {
-			const totalSlides = this.loop ? this.slideArray.length - 2 : this.slideArray.length; // Consider duplicates  
-			const newIndex = this.index.prev === -1 ? totalSlides - 1 : this.index.prev; // Loop to last if at start  
-			this.changeSlide(newIndex);
+			this.newIndex = this.index.prev === -1 ? this.totalSlides - 1 : this.index.prev; // Loop to last if at start  
+			this.changeSlide(this.newIndex);
 	}
 
 	activeNextSlide() {
-			const totalSlides = this.loop ? this.slideArray.length - 2 : this.slideArray.length; // Consider duplicates  
-			const newIndex = this.index.next === totalSlides ? 0 : this.index.next; // Loop to first if at end  
-			this.changeSlide(newIndex);
+			this.newIndex = this.index.next === this.totalSlides ? 0 : this.index.next; // Loop to first if at end  
+			this.changeSlide(this.newIndex);
 	}
 
 	createDuplicatedSlides() {  
@@ -164,7 +163,6 @@ class Slider {
 	init() {
 		if (this.sliderContent && this.wrapper) {
 			this.bindEvents();
-			this.transition(true);
 			this.addEvents();
 			this.sliderConfig();
 			this.createDuplicatedSlides();
