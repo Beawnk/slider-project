@@ -5,10 +5,6 @@ class Slider {
 		this.wrapper = document.querySelector(wrapper);
 		this.activeClass = activeClass || "active";
 		this.distance = { finalPosition: 0, startX: 0, movement: 0 };
-        this.rafId = null; // Added to handle requestAnimationFrame id  
-		this.index = { active: 0, prev: undefined, next: undefined };  
-		this.slideArray = [];  
-		this.addEvents();  
 	}
 
 	onStart(event) {
@@ -129,7 +125,7 @@ class Slider {
 
 	bindEvents() {
 		this.onStart = this.onStart.bind(this);
-		this.onMove = throttle(this.onMove.bind(this), 100);
+		this.onMove = this.onMove.bind(this);
 		this.onStop = this.onStop.bind(this);
 
 		this.activePrevSlide = this.activePrevSlide.bind(this);
