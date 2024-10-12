@@ -1,10 +1,18 @@
 class Slider {
-	constructor({ sliderContent, wrapper, activeClass, loop }) {
+	constructor({ sliderContent, wrapper, activeClass, loop, arrows, prevImg, nextImg, controls, customControls }) {
 		this.sliderContent = document.querySelector(sliderContent);
 		this.wrapper = document.querySelector(wrapper);
 		this.activeClass = activeClass || "active";
 		this.loop = loop === true ? loop : false;
 		this.distance = { finalPosition: 0, startX: 0, movement: 0 };
+		this.arrows = arrows === true ? arrows : false;
+		console.log(this.arrows);
+		this.prevImg = prevImg;
+		this.nextImg = nextImg;
+		this.controls = controls === true ? controls : false;
+		this.customControls = customControls !== undefined ? customControls : '.control';
+
+		this.init();
 	}
 
 	onStart(event) {
@@ -111,6 +119,12 @@ class Slider {
 		this.slideIndexNav(index);
 		this.distance.finalPosition = activeSlide.position;
 		this.changeActiveClass();
+		if (this.arrows === true) {
+            this.disableArrows();
+        }
+        if (this.controls === true) {
+            this.activeControl();
+        }
 	}
 
 	activePrevSlide() {
@@ -149,65 +163,29 @@ class Slider {
 		}, 500);
 	}
 
-	bindEvents() {
-		this.onStart = this.onStart.bind(this);
-		this.onMove = this.onMove.bind(this);
-		this.onStop = this.onStop.bind(this);
-
-		this.activePrevSlide = this.activePrevSlide.bind(this);
-		this.activeNextSlide = this.activeNextSlide.bind(this);
-
-		this.onResize = debounce(this.onResize.bind(this), 200);
-	}
-
-	init() {
-		if (this.sliderContent && this.wrapper) {
-			this.bindEvents();
-			this.addEvents();
-			this.sliderConfig();
-			this.createDuplicatedSlides();
-		}
-		return this;
-	}
-}
-
-class SlideNav extends Slider {
-	constructor(
-		{ sliderContent, wrapper, activeClass, loop },
-		{ arrows, prevImg, nextImg, controls, customControls }
-	) {
-		super(
-			{ sliderContent, wrapper, activeClass, loop }
-		);
-        this.arrows = arrows === true ? arrows : false;
-		this.prevImg = prevImg;
-		this.nextImg = nextImg;
-		this.controls = controls === true ? controls : false;
-		this.customControls = customControls !== undefined ? customControls : '.control';
-		
-		this.init();
-	}
-
 	createArrow() {
-		this.arrowWrapper = document.createElement("div");
-		this.arrowPrev = document.createElement("span");
-		this.arrowNext = document.createElement("span");
+		if (this.arrows === true) {
+			this.arrowWrapper = document.createElement("div");
+			this.arrowPrev = document.createElement("span");
+			this.arrowNext = document.createElement("span");
 
-		this.arrowWrapper.className = "arrow-nav";
-		this.arrowPrev.className = "arrow prev";
-		this.arrowNext.className = "arrow next";
+			this.arrowWrapper.className = "arrow-nav";
+			this.arrowPrev.className = "arrow prev";
+			this.arrowNext.className = "arrow next";
 
-		this.wrapper.children[0].appendChild(this.arrowWrapper);
-		this.arrowWrapper.appendChild(this.arrowPrev);
-		this.arrowWrapper.appendChild(this.arrowNext);
+			this.wrapper.children[0].appendChild(this.arrowWrapper);
+			this.arrowWrapper.appendChild(this.arrowPrev);
+			this.arrowWrapper.appendChild(this.arrowNext);
 
-        if (this.prevImg && this.nextImg) {
-            this.arrowPrev.style.backgroundImage = `url(${this.prevImg})`;
-		    this.arrowNext.style.backgroundImage = `url(${this.nextImg})`;
-        } else {
-            this.arrowPrev.innerHTML = "🢐";
-            this.arrowNext.innerHTML = "🢒";
-        }
+			if (this.prevImg && this.nextImg) {
+				this.arrowPrev.style.backgroundImage = `url(${this.prevImg})`;
+				this.arrowNext.style.backgroundImage = `url(${this.nextImg})`;
+			} else {
+				this.arrowPrev.innerHTML = "🢐";
+				this.arrowNext.innerHTML = "🢒";
+			}
+			this.addArrow();
+		}
 	}
 
 	addArrow() {
@@ -225,21 +203,23 @@ class SlideNav extends Slider {
 	}
 
 	disableArrows() {  
-        if (this.index.prev === undefined) {  
-            this.prevElement.classList.add("disabled");  
-            this.prevElement.removeEventListener("click", this.activePrevSlide);  
-        } else if (this.index.prev !== undefined && this.prevElement.classList.contains("disabled")) {  
-            this.prevElement.classList.remove("disabled");  
-            this.addArrowEvents();
-        }  
-    
-        if (this.index.next === undefined) {  
-            this.nextElement.classList.add("disabled");  
-            this.nextElement.removeEventListener("click", this.activeNextSlide);  
-        } else if (this.index.next !== undefined && this.nextElement.classList.contains("disabled")) {  
-            this.nextElement.classList.remove("disabled");  
-            this.addArrowEvents();  
-        }  
+		if (this.arrows === true) {
+        	if (this.index.prev === undefined) {  
+				this.prevElement.classList.add("disabled");  
+				this.prevElement.removeEventListener("click", this.activePrevSlide);  
+			} else if (this.index.prev !== undefined && this.prevElement.classList.contains("disabled")) {  
+				this.prevElement.classList.remove("disabled");  
+				this.addArrowEvents();
+			}  
+		
+			if (this.index.next === undefined) {  
+				this.nextElement.classList.add("disabled");  
+				this.nextElement.removeEventListener("click", this.activeNextSlide);  
+			} else if (this.index.next !== undefined && this.nextElement.classList.contains("disabled")) {  
+				this.nextElement.classList.remove("disabled");  
+				this.addArrowEvents();  
+			}  
+		}
     }
 
 	createControls() {
@@ -287,23 +267,24 @@ class SlideNav extends Slider {
 		});
 	}
 
-	changeSlide(index) {
-		super.changeSlide(index);
-		if (this.arrows === true) {
-            this.disableArrows();
-        }
-        if (this.controls === true) {
-            this.activeControl();
-        }
+	bindEvents() {
+		this.onStart = this.onStart.bind(this);
+		this.onMove = this.onMove.bind(this);
+		this.onStop = this.onStop.bind(this);
+
+		this.activePrevSlide = this.activePrevSlide.bind(this);
+		this.activeNextSlide = this.activeNextSlide.bind(this);
+
+		this.onResize = debounce(this.onResize.bind(this), 200);
 	}
 
 	init() {
-		super.init();
-        if (this.sliderContent && this.wrapper) {
-            if (this.arrows === true) {
-                this.createArrow();
-                this.addArrow();
-            }
+		if (this.sliderContent && this.wrapper) {
+			this.bindEvents();
+			this.addEvents();
+			this.sliderConfig();
+			this.createDuplicatedSlides();
+            this.createArrow();
             if (this.controls === true) {
                 if (this.customControls === '.control') {
                     this.createControls();
@@ -313,24 +294,20 @@ class SlideNav extends Slider {
                 }
             }
             this.changeSlide(0);
-            if (this.arrows === true) {
-                this.disableArrows();
-            }
+            this.disableArrows();
             this.arrowKeyListener();
-        }
+		}
 		return this;
 	}
 }
 
 // skipcq: JS-R1002
-new SlideNav(
+new Slider (
 	{   
 		sliderContent: ".slider-content",
 		wrapper: ".slider-wrapper",
 		activeClass: undefined,
-		loop: true
-	},
-	{
+		loop: true,
         arrows: true,
 		prevImg: "/images/arrow-prev.png",
 		nextImg: "/images/arrow-next.png",
