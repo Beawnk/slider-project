@@ -223,20 +223,26 @@ class Slider {
     }
 
 	createControls() {
-		const controls = document.createElement("ul");
-		controls.className = "controls";
-		this.wrapper.appendChild(controls);
-		this.slideArray.forEach((item, index) => {
-			const control = document.createElement("li");
-			control.className = "control";
-			control.addEventListener("click", () => this.changeSlide(index));
-			controls.appendChild(control);
-		});
-		this.addControls();
+		this.slideArrayFixed = this.loop ? this.slideArray.slice(1, this.slideArray.length - 1) : this.slideArray;
+		if (this.controls === true && this.customControls === '.control') {
+			const controls = document.createElement("ul");
+			controls.className = "controls";
+			this.wrapper.appendChild(controls);
+
+			this.slideArrayFixed.forEach((item, index) => {
+				const control = document.createElement("li");
+				control.className = "control";
+				control.addEventListener("click", () => this.changeSlide(index));
+				controls.appendChild(control);
+			});
+			this.addControls();
+		} else if (this.controls === true && this.customControls !== '.control') {
+			this.addControls();
+		}
 	}
 
     addCustomControls() {
-        this.slideArray.forEach(() => {
+        this.slideArrayFixed.forEach(() => {
 			this.controlsArray.forEach((control, i) => {
                 control.addEventListener("click", () => this.changeSlide(i));
             });
@@ -248,6 +254,7 @@ class Slider {
 			`${this.customControls}`
 		);
 		this.controlsArray = [...this.controlsNode];
+		this.addCustomControls();
 	}
 
 	activeControl() {
@@ -285,14 +292,7 @@ class Slider {
 			this.sliderConfig();
 			this.createDuplicatedSlides();
             this.createArrow();
-            if (this.controls === true) {
-                if (this.customControls === '.control') {
-                    this.createControls();
-                } else {
-                    this.addControls();
-                    this.addCustomControls();
-                }
-            }
+            this.createControls();
             this.changeSlide(0);
             this.disableArrows();
             this.arrowKeyListener();
