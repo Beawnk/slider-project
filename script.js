@@ -6,7 +6,6 @@ class Slider {
 		this.loop = loop === true ? loop : false;
 		this.distance = { finalPosition: 0, startX: 0, movement: 0 };
 		this.arrows = arrows === true ? arrows : false;
-		console.log(this.arrows);
 		this.prevImg = prevImg;
 		this.nextImg = nextImg;
 		this.controls = controls === true ? controls : false;
@@ -197,8 +196,14 @@ class Slider {
 	addArrowEvents() {
         const events = ['click', 'touchstart'];  
         events.forEach(event => {
-            this.prevElement.addEventListener(event, this.activePrevSlide);  
-            this.nextElement.addEventListener(event, this.activeNextSlide);  
+            this.prevElement.addEventListener(event, () => {
+				this.index.active === 0 ? this.transition(false) : this.transition(true);
+				this.activePrevSlide();
+			});  
+            this.nextElement.addEventListener(event, () => {
+				this.index.active === this.totalSlides - 1 ? this.transition(false) : this.transition(true);
+				this.activeNextSlide();
+			});  
         }); 
 	}
 
